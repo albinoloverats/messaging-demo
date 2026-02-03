@@ -1,0 +1,8 @@
+scrape_configs:
+  - job_name: 'spring-actuator'
+    metrics_path: '/actuator/prometheus'
+    scrape_interval: 5s
+    dns_sd_configs:
+      - names: [ 'messaging-server', 'messaging-demo' ]
+        type: A
+        port: 8080

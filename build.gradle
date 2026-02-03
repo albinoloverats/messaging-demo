@@ -1,0 +1,32 @@
+plugins {
+	id "java"
+	id "io.spring.dependency-management" version "1.1.7"
+	id "io.freefair.lombok" version "9.2.0"
+	id "io.freefair.aspectj.post-compile-weaving" version "9.2.0"
+}
+
+allprojects {
+	group "net.albinoloverats.messaging"
+	version "0.0.2"
+	repositories {
+		mavenLocal()
+		mavenCentral()
+	}
+}
+
+subprojects {
+	apply plugin: "java"
+	apply plugin: "io.spring.dependency-management"
+	apply plugin: "io.freefair.lombok"
+	apply plugin: "io.freefair.aspectj.post-compile-weaving"
+
+	dependencyManagement {
+		imports {
+			mavenBom "org.springframework.boot:spring-boot-dependencies:4.0.2"
+		}
+	}
+
+	tasks.named("test") {
+		useJUnitPlatform()
+	}
+}

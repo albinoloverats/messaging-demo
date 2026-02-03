@@ -1,0 +1,9 @@
+messaging:
+  hosts:
+    - auto
+  ssl:
+    protocol: TLS
+    pem:
+      keyPath: /opt/messaging/ssl/pem/server-key.pem
+      certificatePath: /opt/messaging/ssl/pem/server-cert.pem
+      trustPath: /opt/messaging/ssl/pem/ca-cert.pem

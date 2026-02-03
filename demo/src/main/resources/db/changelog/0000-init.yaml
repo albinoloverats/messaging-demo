@@ -1,0 +1,32 @@
+databaseChangeLog:
+  - changeSet:
+      id: 0000-init
+      author: ashley
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: hops
+                  type: int
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created
+                  type: timestamp
+                  constraints:
+                    nullable: false
+              - column:
+                  name: persisted
+                  type: timestamp
+                  constraints:
+                    nullable: false
+              - column:
+                  name: data
+                  type: clob
+            tableName: event

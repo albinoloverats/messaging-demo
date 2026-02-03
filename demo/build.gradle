@@ -1,0 +1,57 @@
+plugins {
+	id "java"
+	id "org.springframework.boot" version "4.0.2"
+	id "io.spring.dependency-management"
+	id "io.freefair.lombok"
+	id "io.freefair.aspectj.post-compile-weaving"
+}
+
+dependencies {
+	implementation "net.albinoloverats.messaging:messaging-client:0.0.2"
+
+	implementation "org.bouncycastle:bcprov-jdk18on:1.83"
+	implementation "org.bouncycastle:bcpkix-jdk18on:1.83"
+
+	implementation "org.springframework.boot:spring-boot-starter-web"
+	implementation "org.springframework.boot:spring-boot-starter-actuator"
+	implementation "org.springframework.boot:spring-boot-starter-data-jpa"
+	implementation "org.springframework.boot:spring-boot-starter-webflux"
+
+	implementation "io.micrometer:micrometer-core:1.16.2"
+	implementation "io.micrometer:micrometer-registry-prometheus:1.16.2"
+
+	implementation "org.mapstruct:mapstruct:1.6.3"
+	annotationProcessor "org.mapstruct:mapstruct-processor:1.6.3"
+
+	runtimeOnly "org.mariadb.jdbc:mariadb-java-client"
+	runtimeOnly "org.liquibase:liquibase-core"
+
+
+	implementation "org.axonframework:axon-spring-boot-starter:4.12.1"
+	implementation "org.axonframework:axon-messaging:4.12.1"
+	implementation "org.axonframework:axon-eventsourcing:4.12.1"
+
+	implementation "org.springframework.kafka:spring-kafka"
+
+	// needed for Kafka and Axon
+	implementation 'tools.jackson.core:jackson-core:3.0.4'
+	implementation 'tools.jackson.core:jackson-databind:3.0.4'
+	implementation 'com.fasterxml.jackson.core:jackson-annotations:3.0-rc5'
+
+	implementation "org.aspectj:aspectjrt:1.9.25.1"
+	implementation "com.jcabi:jcabi-aspects:0.26.0"
+	aspect "com.jcabi:jcabi-aspects:0.26.0"
+
+
+	testImplementation "org.springframework.boot:spring-boot-starter-test"
+	testImplementation "net.albinoloverats.messaging:messaging-test:0.0.2"
+	testImplementation platform("org.junit:junit-bom:6.0.2")
+	testImplementation "org.junit.jupiter:junit-jupiter"
+	testImplementation "org.mockito:mockito-junit-jupiter:5.21.0"
+	testRuntimeOnly "org.junit.platform:junit-platform-launcher"
+	testRuntimeOnly "com.h2database:h2:2.4.240"
+}
+
+test {
+	useJUnitPlatform()
+}

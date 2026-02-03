@@ -1,0 +1,162 @@
+services:
+
+  # metrics
+
+  prometheus:
+    image: prom/prometheus
+    hostname: prometheus
+    volumes:
+      - ./docker/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - messaging-net
+
+  grafana:
+    image: grafana/grafana
+    hostname: grafana
+    ports:
+      - "3000:3000"
+    depends_on:
+      - prometheus
+    networks:
+      - messaging-net
+
+  # reverse proxy / load balancer
+
+  traefik:
+    image: traefik:v3.1
+    command:
+      - "--providers.docker=true"
+      - "--entrypoints.tcp-messaging.address=:2413"
+      - "--entrypoints.web.address=:8080"
+      - "--api=true"   # enable API (dashboard)
+    ports:
+#      - "2413:2413"
+      - "8080:8080"
+    networks:
+      - messaging-net
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    labels:
+      - "traefik.http.routers.traefik.rule=Host(`traefik.localhost`)"
+      - "traefik.http.routers.traefik.entrypoints=web"
+      - "traefik.http.routers.traefik.service=api@internal"
+
+  # database
+
+  mariadb:
+    image: mariadb
+    hostname: database
+    restart: always
+    ports:
+      - "3306:3306"
+    networks:
+      - messaging-net
+    environment:
+      - MARIADB_ROOT_PASSWORD=root
+    volumes:
+      - ./docker/database:/docker-entrypoint-initdb.d
+
+  # axon
+
+  axon:
+    image: axoniq/axonserver:latest
+    hostname: axonserver
+    networks:
+      - messaging-net
+    ports:
+      - '8124:8124'
+    environment:
+      - AXONIQ_AXONSERVER_STANDALONE=true
+
+  # kafka
+
+  kafka:
+    image: confluentinc/cp-kafka:latest
+    container_name: kafka
+    hostname: kafka-server
+    ports:
+      - "29092:29092"   # external port for host
+      - "9092:9092"     # internal port for containers
+    volumes:
+      - kafka-data:/var/lib/kafka/data
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_LISTENERS: INTERNAL://:9092,EXTERNAL://:29092,CONTROLLER://:9093
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka-server:9092,EXTERNAL://localhost:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+      KAFKA_BROKER_ID: 1
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_CONTROLLER_QUORUM_VOTERS: '1@kafka-server:9093'
+      CLUSTER_ID: '48c8b419-75f8-4034-9279-b1d646ae1a9a'
+      KAFKA_LOG_DIRS: '/var/lib/kafka/data/kraft-combined-logs'
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+#      KAFKA_NUM_PARTITIONS: 5
+    networks:
+      - messaging-net
+
+  # us
+
+  messaging-server:
+    image: albinoloverats/messaging-server:latest
+#    deploy:
+#      replicas: 2
+#    ports:
+#      - "2413:2413"
+    environment:
+      - MESSAGING_SERVERS=auto
+    volumes:
+      - ./docker/messaging:/opt/messaging
+    networks:
+      - messaging-net
+    cap_add:
+      - NET_BROADCAST
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.info.rule=PathPrefix(`/info`)"
+      - "traefik.http.routers.info.entrypoints=web"
+      - "traefik.http.services.info.loadbalancer.server.port=8080"
+
+  messaging-demo:
+    build:
+      context: demo
+      dockerfile: Dockerfile
+#    deploy:
+#      replicas: 5
+    ports:
+      - "8080:8080"
+    depends_on:
+      - messaging-server
+      - mariadb
+#      - traefik
+#      - axon
+#      - kafka
+    environment:
+      - MESSAGING_SERVERS=auto
+      - DB_SERVER=database
+      - DB_USER=root
+      - DB_PASSWORD=root
+      - KAFKA_SERVER=kafka-server:9092
+      - AXON_SERVER=axonserver
+#      - AXON_SEGMENT_COUNT=5
+    networks:
+      - messaging-net
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.demo.rule=PathPrefix(`/demo`)"
+      - "traefik.http.routers.demo.entrypoints=web"
+      - "traefik.http.services.demo.loadbalancer.server.port=8080"
+
+# other bits
+
+networks:
+  messaging-net:
+
+volumes:
+  kafka-data:

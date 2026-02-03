@@ -1,0 +1,66 @@
+spring:
+  application:
+    name: messaging-demo
+  profiles:
+    active: default
+  datasource:
+    url: jdbc:mariadb://${DB_SERVER:localhost}:3306/messaging-datastore
+    username: ${DB_USER:root}
+    password: ${DB_PASSWORD:root}
+    driverClassName: org.mariadb.jdbc.Driver
+    liquibase:
+      enabled: true
+      change-log: classpath:db/changelog/db.changelog-master.yaml
+  jpa:
+    hibernate:
+      ddl-auto: update
+  kafka:
+    bootstrap-servers: ${KAFKA_SERVER:localhost:29092}
+    consumer:
+      group-id: demo-comparison-group-id
+
+kafka-topic-name: demo-topic
+
+server:
+  servlet:
+    context-parameters:
+      max-request-timeout: 60000
+
+messaging:
+  hosts:
+    - ${MESSAGING_SERVERS:localhost}
+  ssl:
+    #    protocol: TLSv1.3
+    #    jks:
+    #      trustStorePath: classpath:ssl/jks/client-truststore.jks
+    #      trustStorePassword: changeit
+    pem:
+      trustPath: classpath:ssl/pem/ca-cert.pem
+
+axon:
+  axonserver:
+    enabled: false
+    servers: ${AXON_SERVER:localhost}
+    client-name: demo-application-${random.uuid}
+    context: default
+  serializer:
+    general: jackson
+    event: jackson
+    messages: jackson
+  eventhandling:
+    processors:
+      demoProcessor:
+        mode: tracking
+        initial-segment-count: ${AXON_SEGMENT_COUNT:1}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: [ health, prometheus, eventProcessors ]
+
+logging:
+  level:
+    root: WARN
+    net.albinoloverats.messaging: ${LOG_LEVEL:INFO}
+#    com.jcabi.aspects: INFO # Keep this at INFO unless debugging aspects
