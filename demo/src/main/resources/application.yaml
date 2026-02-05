@@ -3,10 +3,13 @@ spring:
     name: messaging-demo
   profiles:
     active: default
+  docker:
+    compose:
+      enabled: false
   datasource:
-    url: jdbc:mariadb://${DB_SERVER:localhost}:3306/messaging-datastore
-    username: ${DB_USER:root}
-    password: ${DB_PASSWORD:root}
+    url: jdbc:mariadb://${MARIADB_SERVER:localhost}:3306/${MARIADB_DATABASE:messaging-datastore}
+    username: ${MARIADB_USER:root}
+    password: ${MARIADB_PASSWORD:root}
     driverClassName: org.mariadb.jdbc.Driver
     liquibase:
       enabled: true
@@ -30,10 +33,10 @@ messaging:
   hosts:
     - ${MESSAGING_SERVERS:localhost}
   ssl:
-    #    protocol: TLSv1.3
-    #    jks:
-    #      trustStorePath: classpath:ssl/jks/client-truststore.jks
-    #      trustStorePassword: changeit
+#    protocol: TLSv1.3
+#    jks:
+#      trustStorePath: classpath:ssl/jks/client-truststore.jks
+#      trustStorePassword: changeit
     pem:
       trustPath: classpath:ssl/pem/ca-cert.pem
 
