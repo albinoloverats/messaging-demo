@@ -13,12 +13,11 @@ import net.albinoloverats.messaging.demo.store.Event;
 import net.albinoloverats.messaging.demo.store.EventMapper;
 import net.albinoloverats.messaging.demo.store.EventRepository;
 import net.albinoloverats.messaging.demo.utils.Counters;
-import org.axonframework.config.ProcessingGroup;
-import org.axonframework.eventhandling.EventHandler;
+import org.axonframework.eventhandling.annotation.EventHandler;
 import org.axonframework.eventhandling.gateway.EventGateway;
-import org.axonframework.messaging.responsetypes.ResponseTypes;
+import org.axonframework.queryhandling.annotation.QueryHandler;
 import org.axonframework.queryhandling.QueryGateway;
-import org.axonframework.queryhandling.QueryHandler;
+import org.axonframework.messaging.unitofwork.ProcessingContext;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
@@ -31,7 +30,7 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.IntStream;
 
-@ProcessingGroup("demoProcessor")
+//@ProcessingGroup("demoProcessor")
 @Component
 @Profile("axon")
 @Slf4j
@@ -42,13 +41,15 @@ public class AxonService
 	private final Counters counters;
 	private final EventGateway eventGateway;
 	private final QueryGateway queryGateway;
+	private final ProcessingContext processingContext;
 
 	public AxonService(EventRepository eventRepository,
 	                   EventMapper eventMapper,
 	                   MessagingGateway messagingGateway,
 	                   MeterRegistry meterRegistry,
 	                   EventGateway eventGateway,
-	                   QueryGateway queryGateway)
+	                   QueryGateway queryGateway,
+	                   ProcessingContext processingContext)
 	{
 		this.eventRepository = eventRepository;
 		this.eventMapper = eventMapper;
@@ -57,6 +58,7 @@ public class AxonService
 				meterRegistry);
 		this.eventGateway = eventGateway;
 		this.queryGateway = queryGateway;
+		this.processingContext = processingContext;
 	}
 
 	/*
@@ -72,7 +74,7 @@ public class AxonService
 				.forEach(i ->
 				{
 					val event = new ExampleEvent(body, hops);
-					eventGateway.publish(event);
+					eventGateway.publish(processingContext, List.of(event));
 					counters.eventSent(event);
 					log.debug("Published AXON event {}", event);
 					ids.add(event.eventId());
@@ -86,7 +88,7 @@ public class AxonService
 		val query = new ExampleQuery(ids);
 		counters.querySent(query);
 		log.debug("Issuing query {}", query);
-		return queryGateway.query(query, ResponseTypes.instanceOf(ExampleResponse.class))
+		return queryGateway.query(query, ExampleResponse.class)
 				.thenApply(ExampleResponse::events);
 	}
 
@@ -96,7 +98,7 @@ public class AxonService
 		val query = new ExampleQuery(Set.of(ids));
 		counters.querySent(query);
 		log.debug("Issuing query {}", query);
-		return queryGateway.query(query, ResponseTypes.instanceOf(ExampleResponse.class))
+		return queryGateway.query(query, ExampleResponse.class)
 				.thenApply(response -> response.events().stream().findFirst());
 	}
 
@@ -119,7 +121,7 @@ public class AxonService
 		else
 		{
 			val updated = event.withRemaining(remaining);
-			eventGateway.publish(updated);
+			eventGateway.publish(processingContext, List.of(updated));
 			counters.eventSent(updated);
 			log.debug("Forwarded AXON event {}", updated);
 		}
