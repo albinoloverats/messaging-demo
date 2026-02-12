@@ -29,7 +29,7 @@ dependencies {
 	runtimeOnly "org.liquibase:liquibase-core"
 
 
-	implementation "org.axonframework:axon-spring-boot-starter:5.0.0-M3"
+	implementation "org.axonframework:axon-spring-boot-starter:5.0.0-preview"
 
 	implementation "org.springframework.kafka:spring-kafka"
 
