@@ -1,7 +1,7 @@
 plugins {
 	id "java"
 
-	id "org.springframework.boot" version "4.0.3"
+	id "org.springframework.boot" version "4.0.5"
 	id "io.spring.dependency-management"
 
 	id "io.freefair.lombok"
@@ -34,9 +34,8 @@ dependencies {
 	implementation "org.springframework.kafka:spring-kafka"
 
 	// needed for Kafka and Axon
-	implementation "tools.jackson.core:jackson-core:3.0.4"
-	implementation "tools.jackson.core:jackson-databind:3.0.4"
-	implementation "com.fasterxml.jackson.core:jackson-annotations:3.0-rc5"
+	implementation "tools.jackson.core:jackson-core:3.1.0"
+	implementation "tools.jackson.core:jackson-databind:3.1.0"
 
 	implementation "org.aspectj:aspectjrt:1.9.25.1"
 	implementation "com.jcabi:jcabi-aspects:0.26.0"
