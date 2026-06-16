@@ -1,0 +1,21 @@
+spring:
+  application:
+    name: messaging-demo
+  cloud:
+    config:
+      enabled: false
+  datasource:
+    url: jdbc:h2:mem:testdb
+    username: sa
+    password:
+    driverClassName: org.h2.Driver
+    liquibase:
+      enabled: true
+      change-log: classpath:db/changelog/db.changelog-master.yaml
+  jpa:
+    hibernate:
+      ddl-auto: update
+
+axon:
+  axonserver:
+    enabled: false

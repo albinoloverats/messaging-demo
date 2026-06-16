@@ -1,0 +1,11 @@
+plugins {
+	id "java"
+
+	id "org.springframework.boot" version "4.1.0"
+	id "io.spring.dependency-management"
+}
+
+
+dependencies {
+	implementation "org.springframework.cloud:spring-cloud-config-server:5.0.4"
+}

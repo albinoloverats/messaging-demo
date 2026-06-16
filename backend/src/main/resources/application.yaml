@@ -1,0 +1,13 @@
+spring:
+  application:
+    name: backend
+  profiles:
+    active: default
+  main:
+    web-application-type: none
+  config:
+    import: configserver:http://${CONFIG_SERVER:localhost}:3577
+  cloud:
+    config:
+      username: demo
+      password: s3cr3t

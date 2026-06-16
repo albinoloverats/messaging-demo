@@ -1,0 +1,13 @@
+plugins {
+	id "java"
+	id "java-library"
+
+	id "io.freefair.lombok"
+}
+
+dependencies {
+	implementation "net.albinoloverats.messaging:messaging-common:0.1.2-SNAPSHOT"
+
+	implementation "io.micrometer:micrometer-core:1.17.0"
+	implementation "io.micrometer:micrometer-registry-prometheus:1.17.0"
+}

@@ -1,0 +1,14 @@
+spring:
+  datasource:
+    url: jdbc:mariadb://${MARIADB_SERVER:localhost}:3306/${MARIADB_DATABASE:messaging-datastore}
+    username: ${MARIADB_USER:root}
+    password: ${MARIADB_PASSWORD:root}
+    driverClassName: org.mariadb.jdbc.Driver
+    liquibase:
+      enabled: true
+      change-log: classpath:db/changelog/db.changelog-master.yaml
+  jpa:
+    hibernate:
+      ddl-auto: update
+
+backend:

@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: messaging-demo
+  cloud:
+    config:
+      enabled: false
+
+axon:
+  axonserver:
+    enabled: false

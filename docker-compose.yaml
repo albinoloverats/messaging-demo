@@ -124,9 +124,18 @@ services:
       - "traefik.http.routers.info.entrypoints=web"
       - "traefik.http.services.info.loadbalancer.server.port=8080"
 
-  messaging-demo:
+  messaging-config:
     build:
-      context: demo
+      context: config
+      dockerfile: Dockerfile
+    networks:
+      - messaging-net
+    ports:
+      - '3577:3577'
+
+  messaging-frontend:
+    build:
+      context: frontend
       dockerfile: Dockerfile
 #    deploy:
 #      replicas: 5
@@ -134,16 +143,12 @@ services:
       - "8080:8080"
     depends_on:
       - messaging-server
-      - mariadb
 #      - traefik
 #      - axon
 #      - kafka
     environment:
+      - CONFIG_SERVER=config
       - MESSAGING_SERVERS=auto
-      - MARIADB_SERVER=database
-      - MARIADB_DATABASE=messaging-datastore
-      - MARIADB_USER=root
-      - MARIADB_PASSWORD=root
       - KAFKA_SERVER=kafka-server:9092
       - AXON_SERVER=axonserver
 #      - AXON_SEGMENT_COUNT=5
@@ -154,6 +159,30 @@ services:
       - "traefik.http.routers.demo.rule=PathPrefix(`/demo`)"
       - "traefik.http.routers.demo.entrypoints=web"
       - "traefik.http.services.demo.loadbalancer.server.port=8080"
+
+  messaging-backend:
+    build:
+      context: frontend
+      dockerfile: Dockerfile
+#    deploy:
+#      replicas: 5
+    depends_on:
+      - messaging-server
+      - mariadb
+#      - axon
+#      - kafka
+    environment:
+      - CONFIG_SERVER=config
+      - MESSAGING_SERVERS=auto
+      - MARIADB_SERVER=database
+      - MARIADB_DATABASE=messaging-datastore
+      - MARIADB_USER=root
+      - MARIADB_PASSWORD=root
+      - KAFKA_SERVER=kafka-server:9092
+      - AXON_SERVER=axonserver
+#      - AXON_SEGMENT_COUNT=5
+    networks:
+      - messaging-net
 
 # other bits
 

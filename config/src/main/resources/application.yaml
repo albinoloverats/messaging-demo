@@ -1,0 +1,17 @@
+spring:
+  application:
+    name: config
+  profiles:
+    active: native
+  cloud:
+    config:
+      server:
+        native:
+          searchLocations: classpath:config/
+  security:
+    user:
+      name: demo
+      password: s3cr3t
+
+server:
+  port: 3577
