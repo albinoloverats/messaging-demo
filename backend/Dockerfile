@@ -1,5 +1,4 @@
 FROM eclipse-temurin:25
 WORKDIR /app
-COPY build/libs/backend-0.1.1.jar app.jar
-EXPOSE 8080
-ENTRYPOINT ["java", "-jar", "app.jar"]
+COPY backend/build/libs/backend-0.1.2.jar backend.jar
+ENTRYPOINT ["java", "-jar", "backend.jar"]

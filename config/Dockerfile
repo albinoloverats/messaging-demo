@@ -1,4 +1,4 @@
 FROM eclipse-temurin:25
 WORKDIR /app
-COPY build/libs/config.jar config.jar
+COPY config/build/libs/config-0.1.2.jar config.jar
 ENTRYPOINT ["java", "-jar", "config.jar"]

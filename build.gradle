@@ -7,7 +7,7 @@ plugins {
 
 allprojects {
 	group "net.albinoloverats.messaging"
-	version "0.1.1"
+	version "0.1.2"
 	repositories {
 		mavenLocal()
 		mavenCentral()
@@ -27,6 +27,7 @@ subprojects {
 	dependencyManagement {
 		imports {
 			mavenBom "org.springframework.boot:spring-boot-dependencies:4.1.0"
+			mavenBom "tools.jackson:jackson-bom:3.2.0"
 		}
 	}
 

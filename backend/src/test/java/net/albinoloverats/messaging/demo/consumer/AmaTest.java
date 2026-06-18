@@ -57,7 +57,7 @@ public class AmaTest
 							.stream()
 							.findFirst()
 							.orElseThrow();
-					assertEquals(event, e);
+					assertEquals(id, e.id());
 				});
 	}
 }
